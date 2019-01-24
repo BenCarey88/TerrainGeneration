@@ -1,8 +1,10 @@
+//----------------------------------------------------------------------------------------------------------------------
+/// @file NGLScene.cpp
+/// @brief implementation file for NGLScene class
+//----------------------------------------------------------------------------------------------------------------------
+
 #include <QMouseEvent>
 #include <QGuiApplication>
-
-#include "NGLScene.h"
-#include "Camera.h"
 
 #include <ngl/Transformation.h>
 #include <ngl/NGLInit.h>
@@ -12,27 +14,27 @@
 #include <ngl/SimpleIndexVAO.h>
 #include <array>
 #include <ngl/Random.h>
+#include <ngl/Quaternion.h>
+
+#include "NGLScene.h"
+#include "Camera.h"
 #include "TerrainGenerator.h"
 
-#include <ngl/Quaternion.h>
 
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget( _parent )
 {
-
-    // set this widget to have the initial keyboard focus
-    setFocus();
-    // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
-    this->resize(_parent->size());
-
-  //setTitle("Qt5 SimpleIndexVAO created from VAOFactory NGL Demo");
+  // set this widget to have the initial keyboard focus
+  setFocus();
+  // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
+  this->resize(_parent->size());
 }
-
 
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
   m_vao->removeVAO();
 }
+
 
 void NGLScene::resizeGL( int _w, int _h )
 {
@@ -42,14 +44,12 @@ void NGLScene::resizeGL( int _w, int _h )
 }
 
 
-
 void NGLScene::initializeGL()
 {
-
-    size_t dimension = 129;
-    m_terrainValues = TerrainGenerator(dimension);
-    m_terrainValues.generate();
-    m_terrain = TerrainData(m_terrainValues.m_dimension, m_terrainValues.m_heightMap);
+  size_t dimension = 129;
+  m_terrainValues = TerrainGenerator(dimension);
+  m_terrainValues.generate();
+  m_terrain = TerrainData(m_terrainValues.m_dimension, m_terrainValues.m_heightMap);
 
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
@@ -61,16 +61,10 @@ void NGLScene::initializeGL()
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_MULTISAMPLE);
-  // Now we will create a basic Camera from the graphics library
-  // This is a static camera so it only needs to be set once
-  // First create Values for the camera position
-  /*ngl::Vec3 from(0,1,2);
-  ngl::Vec3 to(0,0,0);
-  ngl::Vec3 up(0,1,0);*/
-
+  // Now we will create a basic Camera from the graphics library using our camera class
   m_view=ngl::lookAt(m_camera.m_from, m_camera.m_to, m_camera.m_up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
-  // The final two are near and far clipping planes of 0.5 and 10
+  // The final two are near and far clipping planes
   m_project=ngl::perspective(fieldOfView ,720.0f/576.0f,nearFrame,farFrame);
 
   // now to load the shader and set the values
@@ -92,7 +86,6 @@ void NGLScene::initializeGL()
   shader->attachShaderToProgram(ColourShader,ColourVertex);
   shader->attachShaderToProgram(ColourShader,ColourFragment);
 
-
   shader->linkProgramObject(ColourShader);
   (*shader)[ColourShader]->use();
 
@@ -103,60 +96,61 @@ void NGLScene::initializeGL()
 
 void NGLScene::buildVAO()
 {
-
+  //run LOD algorithm on m_terrain so m_terrain.m_indices is set up with a list of vertices to be drawn
   m_terrain.meshRefine(m_camera.m_from, m_tolerance, 100.0);
 
+  //create list of vertex positions and colours
   std::vector<ngl::Vec3> vertAndColour;
   float size = m_terrain.m_indices.size();
   for(size_t i = 0; i<size; ++i)
   {
-      /*float x = (m_terrain.m_vertices[m_terrain.m_indices[i]].x - m_terrain.m_dimension/2) * 50.0f/m_terrain.m_dimension;
-      float y = (m_terrain.m_vertices[m_terrain.m_indices[i]].y - m_terrain.m_dimension/2) * 50.0f/m_terrain.m_dimension;
-      float z = m_terrain.m_vertices[m_terrain.m_indices[i]].z * 50.0f/m_terrain.m_dimension;*/
-      TerrainData::Vertex vertex = m_terrain.m_vertices[m_terrain.m_indices[i]];
-      ngl::Vec3 pos (vertex.sceneX,vertex.sceneY,vertex.sceneZ);
-      ngl::Vec3 col;
-      float height = vertex.sceneZ/m_terrain.m_scale;
-      if (height > 8.5)
-      {
-          col = ngl::Vec3(1,1,1);
-          col*=std::abs(height)/10;
-      }
-      else if (height > 3)
-      {
-          col = ngl::Vec3(0.5,0.5,0.5);
-          col*=std::abs(height)/10;
-      }
-      else if (height > 0)
-      {
-          col = ngl::Vec3(0,1,0);
-          col*=std::abs(height)/10;
-      }
-      else
-      {
-          col = ngl::Vec3(0,0.5,0);
-          col*=(std::abs(height)/10);
-      }
-      vertAndColour.push_back(pos);
-      vertAndColour.push_back(col);
+    //set position
+    TerrainData::Vertex vertex = m_terrain.m_vertices[m_terrain.m_indices[i]];
+    ngl::Vec3 pos (vertex.sceneX,vertex.sceneY,vertex.sceneZ);
+
+    //set colour
+    ngl::Vec3 col;
+    float height = vertex.sceneZ/m_terrain.m_scale;
+    if (height > 8.5)
+    {
+      col = ngl::Vec3(1,1,1);
+      col*=std::abs(height)/10;
+    }
+    else if (height > 3)
+    {
+      col = ngl::Vec3(0.5,0.5,0.5);
+      col*=std::abs(height)/10;
+    }
+    else if (height > 0)
+    {
+      col = ngl::Vec3(0,1,0);
+      col*=std::abs(height)/10;
+    }
+    else
+    {
+      col = ngl::Vec3(0,0.5,0);
+      col*=(std::abs(height)/10);
+    }
+    vertAndColour.push_back(pos);
+    vertAndColour.push_back(col);
   }
 
+  //create list of indices
   std::vector<GLshort> indices;
   for(size_t i = 0; i< m_terrain.m_indices.size(); ++i)
   {
-      indices.push_back(GLshort(i));
+    indices.push_back(GLshort(i));
   }
 
-  // create a vao as a series of GL_TRIANGLES
+  // create a vao using GL_TRIANGLE_STRIP
   m_vao=ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLE_STRIP);
   m_vao->bind();
 
-  // in this case we are going to set our data as the vertices above
-
+  // set our data as the vertices above
   m_vao->setData(ngl::SimpleIndexVAO::VertexData(
-                                                  sizeof(ngl::Vec3)*vertAndColour.size(), //originally this was: sizeof(vertAndColour) - but std::vectors have fixed size(?) so doesn't work here
-                                                  vertAndColour[0].m_x,    //^note *12 above because an NGL::Vec3 object is size 12 (3 floats, each size 4)
-                                                  indices.size(),          //& originally this was: sizeof(indices)  //since GLshort has size 2, dunno why this isn't 2*test2.size()
+                                                  sizeof(ngl::Vec3)*vertAndColour.size(),
+                                                  vertAndColour[0].m_x,
+                                                  indices.size(),
                                                   &indices[0],
                                                   GL_UNSIGNED_SHORT));
   // data is 24 bytes apart ( two Vec3's) first index
@@ -165,14 +159,8 @@ void NGLScene::buildVAO()
   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,24,3);
   m_vao->setNumIndices(m_terrain.m_indices.size());
 
- // now unbind
+  // now unbind
   m_vao->unbind();
-
-  /*delete [] vertAndColour;
-  vertAndColour = nullptr;
-  delete [] indices;
-  indices = nullptr;*/
-
 }
 
 
@@ -255,7 +243,10 @@ void NGLScene::paintGL()
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
+///EVENTS
+//------------------------------------------------------------------------------------------------------------------------
+
 void NGLScene::mouseMoveEvent( QMouseEvent* _event )
 {
   // note the method buttons() is the button state when event was called
@@ -394,6 +385,9 @@ void NGLScene::keyPressEvent(QKeyEvent* _event)
   //if (isExposed())
     update();
 }
+
+//------------------------------------------------------------------------------------------------------------------------
+///SLOTS
 //------------------------------------------------------------------------------------------------------------------------
 
 void NGLScene::setOctaves(int _octaves)

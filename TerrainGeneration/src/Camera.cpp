@@ -1,4 +1,10 @@
+//----------------------------------------------------------------------------------------------------------------------
+/// @file Camera.cpp
+/// @brief implementation file for Camera class
+//----------------------------------------------------------------------------------------------------------------------
+
 #include "Camera.h"
+
 
 void Camera::update()
 {
@@ -7,6 +13,7 @@ void Camera::update()
   m_trueUp = m_right.cross(m_to-m_from);
   m_trueUp.normalize();
 }
+
 
 void Camera::initialise()
 {

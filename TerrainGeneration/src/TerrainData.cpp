@@ -83,7 +83,7 @@ float TerrainData::Vertex::distanceTo(Vertex v) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///PUBLIC MEMBER FUNCTION
+///PUBLIC MEMBER FUNCTION: MESH REFINE
 //----------------------------------------------------------------------------------------------------------------------
 /// @ref pseudocode from 'Visualisation of Large Terrains Made Easy', Lindstrom and Pascucci, 2001
 /// basically this method starts at the root of the DAG and then moves through the DAG, checking at each stage
@@ -106,7 +106,7 @@ void TerrainData::meshRefine(ngl::Vec3 _cameraPos, float _tolerance, float _lamb
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///PRIVATE MEMBER FUNCTIONS
+///PRIVATE MEMBER FUNCTIONS: BASIC
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -114,19 +114,26 @@ int TerrainData::getX(const size_t _index) const
 {
   return int(_index)%m_dimension;
 }
+
 int TerrainData::getY(const size_t _index) const
 {
   return int(_index)/m_dimension;
 }
+
 size_t TerrainData::getHeightMapIndex(const int _x, const int _y) const
 {
   return size_t(_y*m_dimension+_x);
 }
+
 TerrainData::Vertex TerrainData::getVertex(const size_t _index) const
 {
   return Vertex(getX(_index), getY(_index), m_heightMap[_index], m_dimension, m_scale);
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+///PRIVATE MEMBER FUNCTIONS: CREATING VERTICES
+//----------------------------------------------------------------------------------------------------------------------
 
 void TerrainData::createVerticesWQT(size_t _QTParentHeightMapIndex, size_t _QTParentVerticesIndex,
                                     int _refinementLevel, int _distance)
@@ -165,6 +172,7 @@ void TerrainData::createVerticesWQT(size_t _QTParentHeightMapIndex, size_t _QTPa
                                    _refinementLevel + 2, _distance/2);
   }
 }
+
 void TerrainData::createVerticesBQT(size_t _QTParentHeightMapIndex, size_t _QTParentVerticesIndex,
                                     int _refinementLevel, int _distance)
 {
@@ -213,16 +221,23 @@ void TerrainData::createVerticesBQT(size_t _QTParentHeightMapIndex, size_t _QTPa
   }
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+///PRIVATE MEMBER FUNCTIONS: ASSIGNING CHILDREN
+//----------------------------------------------------------------------------------------------------------------------
+
 size_t TerrainData::getChild1(size_t _QTParent, size_t _DAGParent) const
 {
   size_t child1 = 4 * _QTParent + (2 * _QTParent + _DAGParent - 6) % 4 - 7;
   return child1;
 }
+
 size_t TerrainData::getChild2(size_t _QTParent, size_t _DAGParent) const
 {
   size_t child2 = 4 * _QTParent + (2 * _QTParent + _DAGParent - 5) % 4 - 7;
   return child2;
 }
+
 void TerrainData::assignChildren(size_t _DAGParent, size_t _currentVertex, int _refinementLevel)
 {
   if(_refinementLevel != 0)
@@ -238,6 +253,10 @@ void TerrainData::assignChildren(size_t _DAGParent, size_t _currentVertex, int _
     m_verticesArrangedByGraphLevel[size_t(_refinementLevel)-1].push_back(child2);
   }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+///PRIVATE METHODS: ASSIGN OTHER VERTEX MEMBER VARIABLES
+//----------------------------------------------------------------------------------------------------------------------
 
 void TerrainData::assignRadius()
 {
@@ -257,6 +276,7 @@ void TerrainData::assignRadius()
     }
   }
 }
+
 void TerrainData::assignDelta(size_t _DAGGrandParent, size_t _DAGParent, size_t _currentVertex, int _refinementLevel)
 {
   if(_refinementLevel <= m_maxRefinementLevel)
@@ -269,6 +289,7 @@ void TerrainData::assignDelta(size_t _DAGGrandParent, size_t _DAGParent, size_t 
     assignDelta(_DAGParent,_currentVertex,getChild2(_DAGParent,_currentVertex),_refinementLevel+1);
   }
 }
+
 void TerrainData::assignAugmentedDelta()
 {
   for (auto list : m_verticesArrangedByGraphLevel)

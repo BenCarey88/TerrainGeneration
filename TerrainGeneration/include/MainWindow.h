@@ -1,3 +1,8 @@
+//----------------------------------------------------------------------------------------------------------------------
+/// @file MainWindow.h
+/// @brief MainWindow class, implementing NGL Scene and UI
+//----------------------------------------------------------------------------------------------------------------------
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -7,21 +12,22 @@
 #include "TerrainGenerator.h"
 
 namespace Ui {
-class MainWindow;
+  class MainWindow;
 }
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+  explicit MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
 
 private:
-    Ui::MainWindow *m_ui;
-    /// @brief our openGL widget
-    NGLScene *m_gl;
+  /// @brief our user interface
+  Ui::MainWindow *m_ui;
+  /// @brief our openGL widget
+  NGLScene *m_gl;
 };
 
 #endif // MAINWINDOW_H

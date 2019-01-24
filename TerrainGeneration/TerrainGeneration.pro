@@ -72,4 +72,10 @@ else{ # note brace must be here
 
 #Include Libnoise Library and Headers
 INCLUDEPATH += $$PWD/noise
-LIBS += -L$$PWD/lib -lnoise -lnoiseutils
+unix: LIBS += -L$$PWD/lib -lnoise -lnoiseutils
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Libnoise/bin/ -llibnoise
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Libnoise/bin/ -llibnoised
+
+INCLUDEPATH += $$PWD/../../Libnoise/bin
+DEPENDPATH += $$PWD/../../Libnoise/bin

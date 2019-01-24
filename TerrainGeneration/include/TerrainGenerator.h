@@ -1,36 +1,97 @@
+//----------------------------------------------------------------------------------------------------------------------
+/// @file TerrainGenerator.h
+/// @author Ben Carey
+/// @version 1.0
+/// @date 23/01/19 updated to NCCA coding standards
+/// Revision History :
+/// Initial Version 21/01/19
+//----------------------------------------------------------------------------------------------------------------------
+
 #ifndef TERRAINGENERATOR_H_
 #define TERRAINGENERATOR_H_
 
 #include <iostream>
-#include "noiseutils.h"
 #include <vector>
+#include "noiseutils.h"
+
+//----------------------------------------------------------------------------------------------------------------------
+/// @class TerrainGenerator
+/// @brief this class uses libnoise modules to generate heightmap values for the TerrainData class
+/// @todo tidying up variable and method names
+//----------------------------------------------------------------------------------------------------------------------
 
 class TerrainGenerator
 {
 public:
-    TerrainGenerator()=default;
-    TerrainGenerator(size_t _dimension);
-    ~TerrainGenerator()=default;
-    TerrainGenerator(const TerrainGenerator &)=default;
-    TerrainGenerator(TerrainGenerator &&)=default;
-    TerrainGenerator & operator =(const TerrainGenerator &)=default;
-    TerrainGenerator & operator =(TerrainGenerator &&)=default;
+  //CONSTRUCTOR FUNCTIONS
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief default ctor for our Generator class
+  //--------------------------------------------------------------------------------------------------------------------
+  TerrainGenerator()=default;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief ctor for our Generator class
+  /// @param [in] dimension, [in] dimension, the dimension of the terrain being generated
+  /// (this must be 2^n+1 for some positive integer n, based on the way the algorithm is designed)
+  //--------------------------------------------------------------------------------------------------------------------
+  TerrainGenerator(size_t _dimension);
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief default dtor for our Generator class
+  //--------------------------------------------------------------------------------------------------------------------
+  ~TerrainGenerator()=default;
 
-    size_t m_dimension;
-    std::vector<float> m_heightMap;
+  //PUBLIC MEMBER VARIABLES
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief dimension of terrain being generated (must be 2^n+1 for some n)
+  //--------------------------------------------------------------------------------------------------------------------
+  size_t m_dimension;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief heightmap values to be passed into TerrainData class
+  //--------------------------------------------------------------------------------------------------------------------
+  std::vector<float> m_heightMap;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief seed used to randomise terrain generation
+  //--------------------------------------------------------------------------------------------------------------------
+  float m_seed = 0;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief number of octaves in libnoise Perlin module used to generate heightmap values
+  //--------------------------------------------------------------------------------------------------------------------
+  int m_octaves = 3;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief frequency of libnoise Perlin module used to generate heightmap values
+  //--------------------------------------------------------------------------------------------------------------------
+  float m_frequency = 1;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief persistence of libnoise Perlin module used to generate heightmap values
+  //--------------------------------------------------------------------------------------------------------------------
+  float m_persistence = 0.8f;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief lacunarity of libnoise Perlin module used to generate heightmap values
+  //--------------------------------------------------------------------------------------------------------------------
+  float m_lacunarity = 0.5f;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief amplitude of heightmap values generated
+  //--------------------------------------------------------------------------------------------------------------------
+  float m_amplitude = 10;
 
-    float m_seed = 0;
-    int m_octaves = 3;
-    float m_frequency = 1;
-    float m_persistence = 0.8f;
-    float m_lacunarity = 0.5f;
-    float m_amplitude = 10;
+  //PUBLIC MEMBER FUNCTION
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief assigns values to m_heightmap based on current noise attributes
+  //--------------------------------------------------------------------------------------------------------------------
+  void generate();
 
-    float getX(const int _index) const;
-    float getY(const int _index) const;
-    void generate();
+private:
 
-protected:
+  //PRIVATE MEMBER FUNCTIONS
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief returns the x coordinate corresponding to a particular heightmap index
+  /// @param [in] index, the heightmap index
+  //--------------------------------------------------------------------------------------------------------------------
+  float getX(const int _index) const;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief returns the y coordinate corresponding to a particular heightmap index
+  /// @param [in] index, the heightmap index
+  //--------------------------------------------------------------------------------------------------------------------
+  float getY(const int _index) const;
 
 };
 

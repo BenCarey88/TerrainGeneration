@@ -13,10 +13,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
-
-#include "ngl/Mat4.h"
-#include "ngl/Vec3.h"
-#include "ngl/Vec4.h"
+#include <ngl/Vec3.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @class TerrainData
@@ -254,6 +251,7 @@ private:
   /// @brief assigns an augmented delta value to each vertex using m_verticesArrangedByGraphLevel
   //--------------------------------------------------------------------------------------------------------------------
   void assignAugmentedDelta();
+
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief accessed by meshRefine method to recursively apply LOD algorithm
   /// @ref based on pseudocode from Lindstrom and Pascucci (2001)
@@ -264,7 +262,6 @@ private:
   /// @param [in] tolerance, the user-specified error tolerance
   /// @param [in] lambda, equal to the field of view divided by the number of pixels along the field of view
   //--------------------------------------------------------------------------------------------------------------------
-
   void submeshRefine(size_t _DAGParentVertex, size_t _currentVertex, int _refinementLevel,
                        ngl::Vec3 _cameraPos, float _tolerance, float _lambda);
   //--------------------------------------------------------------------------------------------------------------------
