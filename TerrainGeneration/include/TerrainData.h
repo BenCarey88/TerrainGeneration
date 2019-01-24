@@ -32,6 +32,8 @@
 class TerrainData
 {
 public:
+
+  //CONSTRUCTOR FUNCTIONS
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief default ctor for our TerrainData class
   /// needed for m_terrain in NGLScene which starts with heightmap values uninitialised
@@ -43,12 +45,13 @@ public:
   /// (this must be 2^n+1 for positive integer n, based on the way the algorithm is designed)
   /// @param [in] heightmap, the std::vector of z-values for the terrain vertices
   //--------------------------------------------------------------------------------------------------------------------
-  TerrainData(size_t _dimension, std::vector<float> _heightMap);
+  TerrainData(int _dimension, std::vector<float> _heightMap);
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief default dtor for our TerrainData class
   //--------------------------------------------------------------------------------------------------------------------
   ~TerrainData()=default;
 
+  //PUBLIC STRUCT
   //--------------------------------------------------------------------------------------------------------------------
   /// @struct Vertex
   /// @brief this structure stores (x,y,z) coordinates of the vertices in the terrain, as well as attributes required
@@ -110,21 +113,14 @@ public:
     //------------------------------------------------------------------------------------------------------------------
     /// @brief method returning the distance between this vertex and another one
     //------------------------------------------------------------------------------------------------------------------
-    float distanceTo(Vertex v) const {return std::sqrt((v.sceneX-sceneX)*(v.sceneX-sceneX) + (v.sceneY-sceneY)*(v.sceneY-sceneY) + (v.sceneZ-sceneZ)*(v.sceneZ-sceneZ));}
+    float distanceTo(Vertex v) const;
   };
 
+  //PUBLIC MEMBER VARIABLES
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief dimension of terrain grid (must be 2^n+1 for some n)
   //--------------------------------------------------------------------------------------------------------------------
-  int                 m_dimension;
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief the maximum refinement level for the LOD algorithm (equal to the height of the DAG)
-  //--------------------------------------------------------------------------------------------------------------------
-  size_t              m_maxRefinementLevel = size_t(2*std::log2(m_dimension-1));
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief the heightMap values for the terrain (stored as a std::vector of size m_dimension^2)
-  //--------------------------------------------------------------------------------------------------------------------
-  std::vector<float>  m_heightMap = {};
+  int m_dimension;
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief list of vertices of the terrain (stored in an order that allows easy access of child vertices)
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,38 +131,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   std::vector<size_t> m_indices = {};
   //--------------------------------------------------------------------------------------------------------------------
-  /// @brief parity used for the mesh refine method, to decide when to "turn corners" in the triangle strip
+  /// @brief scale used to transform vertices to scene position
   //--------------------------------------------------------------------------------------------------------------------
-  size_t              m_parity = 0;
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief list of indices of m_vertices arranged by their level in DAG, to make it easier to assign radius and delta
-  /// values to the vertices
-  //--------------------------------------------------------------------------------------------------------------------
-  std::vector<std::vector<size_t>> m_verticesArrangedByGraphLevel;
+  float m_scale = 50.0f/m_dimension;
 
 
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief returns the x value associated with a certain index of the heightmap
-  /// @param [in] index, the heightmap index
-  //--------------------------------------------------------------------------------------------------------------------
-  size_t getX(const size_t _index) const;
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief returns the y value associated with a certain index of the heightmap
-  /// @param [in] index, the heightmap index
-  //--------------------------------------------------------------------------------------------------------------------
-  size_t getY(const size_t _index) const;
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief returns the heightmap index for a given set of (x,y) coordinates
-  /// @param [in] x, the x coordinate
-  /// @param [in] y, the y coordinate
-  //--------------------------------------------------------------------------------------------------------------------
-  size_t getHeightMapIndex(const size_t _x, const size_t _y) const;
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief returns a vertex corresponding to a given heightmap index
-  /// @param [in] index, the heightmap index
-  //--------------------------------------------------------------------------------------------------------------------
-  Vertex getVertex(const size_t _index) const;
-
+  //PUBLIC MEMBER FUNCTIONS
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief runs the LOD reduction algorithm on the terrain based on the current camera position and the user-specified
   /// tolerance, then fills m_indices according to this data
@@ -179,13 +149,51 @@ public:
   void meshRefine(ngl::Vec3 _cameraPos, float _tolerance, float _lambda);
 
 
-  //--------------------------------------------------------------------------------------------------------------------
-  /// @brief scale used to transform vertices to scene position
-  //--------------------------------------------------------------------------------------------------------------------
-  float m_scale = 50.0f/m_dimension;
-
 private:
 
+
+  //PRIVATE MEMBER VARIABLES
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief the maximum refinement level for the LOD algorithm (equal to the height of the DAG)
+  //--------------------------------------------------------------------------------------------------------------------
+  int m_maxRefinementLevel = int(2*std::log2(m_dimension-1));
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief the heightMap values for the terrain (stored as a std::vector of size m_dimension^2)
+  //--------------------------------------------------------------------------------------------------------------------
+  std::vector<float>  m_heightMap = {};
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief parity used for the mesh refine method, to decide when to "turn corners" in the triangle strip
+  //--------------------------------------------------------------------------------------------------------------------
+  int m_parity = 0;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief list of list of indices of m_vertices arranged by their level in DAG, to make it easier to assign radius
+  /// and delta values to the vertices
+  //--------------------------------------------------------------------------------------------------------------------
+  std::vector<std::vector<size_t>> m_verticesArrangedByGraphLevel;
+
+
+  //PRIVATE MEMBER FUNCTIONS
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief returns the x value associated with a certain index of the heightmap
+  /// @param [in] index, the heightmap index
+  //--------------------------------------------------------------------------------------------------------------------
+  int getX(const size_t _index) const;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief returns the y value associated with a certain index of the heightmap
+  /// @param [in] index, the heightmap index
+  //--------------------------------------------------------------------------------------------------------------------
+  int getY(const size_t _index) const;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief returns the heightmap index for a given set of (x,y) coordinates
+  /// @param [in] x, the x coordinate
+  /// @param [in] y, the y coordinate
+  //--------------------------------------------------------------------------------------------------------------------
+  size_t getHeightMapIndex(const int _x, const int _y) const;
+  //--------------------------------------------------------------------------------------------------------------------
+  /// @brief returns a vertex corresponding to a given heightmap index
+  /// @param [in] index, the heightmap index
+  //--------------------------------------------------------------------------------------------------------------------
+  Vertex getVertex(const size_t _index) const;
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief recursively fills m_vertices with vertices in an order determined by their positions in the white quadtree
   /// @ref the ordering is based on Lindstrom and Pascucci, 2001
@@ -194,8 +202,9 @@ private:
   /// @param [in] refinementLevel, the refinement level (height in the DAG) of the current vertex
   /// @param [in] distance, the distance from the parent vertex to its children
   //--------------------------------------------------------------------------------------------------------------------
+
   void createVerticesWQT(size_t _QTParentHeightMapIndex, size_t _QTParentVerticesIndex,
-                                      size_t _refinementLevel, size_t _distance);
+                                      int _refinementLevel, int _distance);
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief recursively fills m_vertices with vertices in an order determined by their positions in the black quadtree
   /// @ref the ordering is based on Lindstrom and Pascucci, 2001
@@ -204,8 +213,8 @@ private:
   /// @param [in] refinementLevel, the refinement level (height in the DAG) of the current vertex
   /// @param [in] distance, the distance from the parent vertex to its children
   //--------------------------------------------------------------------------------------------------------------------
-  void createVerticesBQT(size_t _QTParentHeightMapIndex, size_t _QTParentVertexStorageIndex,
-                                      size_t _refinementLevel, size_t _distance);
+  void createVerticesBQT(size_t _QTParentHeightMapIndex, size_t _QTParentVerticesIndex,
+                                      int _refinementLevel, int _distance);
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief returns the index of m_vertices corresponding to the first vertex that is a child of QTParent in the
   /// quadtree structure and a child of DAGParent in the directed acyclic graph structure
@@ -222,14 +231,13 @@ private:
   /// @param [in] DAGParent, the index of the output vertex's graph parent
   //--------------------------------------------------------------------------------------------------------------------
   size_t getChild2(size_t _QTParent, size_t _DAGParent) const;
-
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief recursively fills m_verticesArrangedByGraphLevel and the childList members of each vertex
   /// @param [in] DAGParent, the index of the current vertex's graph parent
   /// @param [in] currentVertex, the index of the current vertex whose childList is being filled
   /// @param [in] refinementLevel, the refinement level (height in the DAG) of the current vertex
   //--------------------------------------------------------------------------------------------------------------------
-  void assignChildren(size_t _DAGParent, size_t _currentVertex, size_t _refinementLevel);
+  void assignChildren(size_t _DAGParent, size_t _currentVertex, int _refinementLevel);
 
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief assigns a bounding sphere radius to each vertex using m_verticesArrangedByGraphLevel
@@ -241,12 +249,11 @@ private:
   /// @param [in] DAGParent, index of the current vertex's parent in the DAG
   /// @param [in] currentVertex, index of the current vertex being assigned
   //--------------------------------------------------------------------------------------------------------------------
-  void assignDelta(size_t _DAGGrandParent, size_t _DAGParent, size_t _currentVertex, size_t _refinementLevel);
+  void assignDelta(size_t _DAGGrandParent, size_t _DAGParent, size_t _currentVertex, int _refinementLevel);
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief assigns an augmented delta value to each vertex using m_verticesArrangedByGraphLevel
   //--------------------------------------------------------------------------------------------------------------------
   void assignAugmentedDelta();
-
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief accessed by meshRefine method to recursively apply LOD algorithm
   /// @ref based on pseudocode from Lindstrom and Pascucci (2001)
@@ -257,7 +264,8 @@ private:
   /// @param [in] tolerance, the user-specified error tolerance
   /// @param [in] lambda, equal to the field of view divided by the number of pixels along the field of view
   //--------------------------------------------------------------------------------------------------------------------
-  void submeshRefine(size_t _DAGParentVertex, size_t _currentVertex, size_t _refinementLevel,
+
+  void submeshRefine(size_t _DAGParentVertex, size_t _currentVertex, int _refinementLevel,
                        ngl::Vec3 _cameraPos, float _tolerance, float _lambda);
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief accessed by submeshRefine method to add active vertices to m_indices
@@ -266,7 +274,7 @@ private:
   /// @param [in] parity, determines whether or not to add additional indices to m_indices in order to turn corners in
   /// the triangle strip
   //--------------------------------------------------------------------------------------------------------------------
-  void tstripAppend(size_t _vertex, size_t _parity);
+  void tstripAppend(size_t _vertex, int _parity);
   //--------------------------------------------------------------------------------------------------------------------
   /// @brief determines whether the current vertex is active and should be included in m_indices
   /// @ref based on pseudocode from Lindstrom and Pascucci (2001)
@@ -274,8 +282,7 @@ private:
   /// @param [in] tolerance, the user-specified error tolerance
   /// @param [in] lambda, equal to the field of view divided by the number of pixels along the field of view
   //--------------------------------------------------------------------------------------------------------------------
-  bool isActive(size_t _vertex, ngl::Vec3 _cameraPos, float _tolerance, float _lambda);
-
+  bool isActive(size_t _vertex, ngl::Vec3 _cameraPos, float _tolerance, float _lambda) const;
 
 };
 

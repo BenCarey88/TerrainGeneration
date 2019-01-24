@@ -221,6 +221,7 @@ void NGLScene::paintGL()
   m_camera.m_up = rotY*m_camera.m_up;
   m_camera.m_from += m_camera.m_to;
   m_camera.update();
+  //m_camera.m_up = m_camera.m_trueUp;
   /*std::cout<<"FROM: ("<<m_camera.m_from.m_x<<", "<<m_camera.m_from.m_y<<", "<<m_camera.m_from.m_z<<")\n"
            <<"TO: ("<<m_camera.m_to.m_x<<", "<<m_camera.m_to.m_y<<", "<<m_camera.m_to.m_z<<")\n"
            <<"UP: ("<<m_camera.m_up.m_x<<", "<<m_camera.m_up.m_y<<", "<<m_camera.m_up.m_z<<")\n"
