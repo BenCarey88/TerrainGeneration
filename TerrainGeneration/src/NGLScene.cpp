@@ -21,6 +21,10 @@
 #include "TerrainGenerator.h"
 
 
+//------------------------------------------------------------------------------------------------------------------------
+///CONSTRUCTORS AND DESTRUCTORS
+//------------------------------------------------------------------------------------------------------------------------
+
 NGLScene::NGLScene(QWidget *_parent) : QOpenGLWidget( _parent )
 {
   // set this widget to have the initial keyboard focus
@@ -36,6 +40,10 @@ NGLScene::~NGLScene()
 }
 
 
+//------------------------------------------------------------------------------------------------------------------------
+///OTHER PUBLIC METHODS
+//------------------------------------------------------------------------------------------------------------------------
+
 void NGLScene::resizeGL( int _w, int _h )
 {
   m_project=ngl::perspective(fieldOfView, static_cast<float>( _w ) / _h, nearFrame, farFrame );
@@ -46,7 +54,8 @@ void NGLScene::resizeGL( int _w, int _h )
 
 void NGLScene::initializeGL()
 {
-  size_t dimension = 129;
+  //generate initial terrain
+  int dimension = 129;
   m_terrainValues = TerrainGenerator(dimension);
   m_terrainValues.generate();
   m_terrain = TerrainData(m_terrainValues.m_dimension, m_terrainValues.m_heightMap);
@@ -57,8 +66,8 @@ void NGLScene::initializeGL()
   ngl::NGLInit::instance();
 
   glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
-  // enable depth testing for drawing
 
+  // enable depth testing for drawing
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_MULTISAMPLE);
   // Now we will create a basic Camera from the graphics library using our camera class
@@ -111,7 +120,7 @@ void NGLScene::buildVAO()
     //set colour
     ngl::Vec3 col;
     float height = vertex.sceneZ/m_terrain.m_scale;
-    if (height > 8.5)
+    if (height > 8.5f)
     {
       col = ngl::Vec3(1,1,1);
       col*=std::abs(height)/10;
@@ -150,7 +159,7 @@ void NGLScene::buildVAO()
   m_vao->setData(ngl::SimpleIndexVAO::VertexData(
                                                   sizeof(ngl::Vec3)*vertAndColour.size(),
                                                   vertAndColour[0].m_x,
-                                                  indices.size(),
+                                                  uint(indices.size()),
                                                   &indices[0],
                                                   GL_UNSIGNED_SHORT));
   // data is 24 bytes apart ( two Vec3's) first index
@@ -203,13 +212,14 @@ void NGLScene::paintGL()
   quatRotY.fromAxisAngle({0,0,1},-m_win.spinYFace);
   ngl::Mat4 rotX = quatRotX.toMat4();
   ngl::Mat4 rotY = quatRotY.toMat4();
-  m_camera.update();;
+  m_camera.update();
+  m_camera.m_up = m_camera.m_trueUp;
   m_camera.m_from -= m_camera.m_to;
   m_camera.m_from = rotX*rotY*m_camera.m_from;
-  m_camera.m_up = rotY*m_camera.m_up;
+  m_camera.m_trueUp = rotX*rotY*m_camera.m_up;
   m_camera.m_from += m_camera.m_to;
   m_camera.update();
-  //m_camera.m_up = m_camera.m_trueUp;
+  m_camera.m_up = m_camera.m_trueUp;
   /*std::cout<<"FROM: ("<<m_camera.m_from.m_x<<", "<<m_camera.m_from.m_y<<", "<<m_camera.m_from.m_z<<")\n"
            <<"TO: ("<<m_camera.m_to.m_x<<", "<<m_camera.m_to.m_y<<", "<<m_camera.m_to.m_z<<")\n"
            <<"UP: ("<<m_camera.m_up.m_x<<", "<<m_camera.m_up.m_y<<", "<<m_camera.m_up.m_z<<")\n"
@@ -387,7 +397,7 @@ void NGLScene::keyPressEvent(QKeyEvent* _event)
 }
 
 //------------------------------------------------------------------------------------------------------------------------
-///SLOTS
+///PUBLIC SLOTS
 //------------------------------------------------------------------------------------------------------------------------
 
 void NGLScene::setOctaves(int _octaves)
@@ -420,7 +430,7 @@ void NGLScene::generate()
 
 void NGLScene::setTolerance(double _tolerance)
 {
-    m_tolerance = _tolerance;
+    m_tolerance = float(_tolerance);
     update();
 }
 

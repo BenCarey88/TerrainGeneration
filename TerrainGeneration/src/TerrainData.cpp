@@ -16,7 +16,7 @@
 TerrainData::TerrainData(int _dimension, std::vector<float> _heightMap) :
     m_dimension(_dimension), m_heightMap(_heightMap)
 {
-  std::cout<<"Initialising...\n";
+  //Fill m_vertices
   size_t dimension = size_t(m_dimension);
   m_vertices.resize(9,Vertex(0,0,0,m_dimension, m_scale));
   m_vertices[0] = getVertex(dimension*dimension - dimension);          //SW corner
@@ -29,14 +29,13 @@ TerrainData::TerrainData(int _dimension, std::vector<float> _heightMap) :
   m_vertices[7] = getVertex((dimension*dimension + dimension - 2)/2);  //right middle
   m_vertices[8] = getVertex((dimension - 1)/2);                        //top middle
 
-  std::cout<<"Filling Vertex List...\n";
   createVerticesWQT((dimension*dimension - 1)/2,             4,3,(m_dimension-1)/4); //fill from root of white quadtree
   createVerticesBQT((dimension*dimension - dimension)/2,     5,4,(m_dimension-1)/4); //fill from root of first black quadtree
   createVerticesBQT(dimension*dimension - (dimension+1)/2,   6,4,(m_dimension-1)/4); //fill from root of second black quadtree
   createVerticesBQT((dimension*dimension + dimension - 2)/2, 7,4,(m_dimension-1)/4); //fill from root of third black quadtree
   createVerticesBQT((dimension - 1)/2,                       8,4,(m_dimension-1)/4); //fill from root of fourth black quadtree
 
-  std::cout<<"Assigning Children...\n";
+  //Assign Children
   m_verticesArrangedByGraphLevel.resize(size_t(m_maxRefinementLevel),{});
   m_verticesArrangedByGraphLevel[size_t(m_maxRefinementLevel)-2]={5,6,7,8};
   m_verticesArrangedByGraphLevel[size_t(m_maxRefinementLevel)-1]={4};
@@ -46,19 +45,17 @@ TerrainData::TerrainData(int _dimension, std::vector<float> _heightMap) :
   assignChildren(4,8,m_maxRefinementLevel-2);
   m_vertices[4].childList = {5,6,7,8};
 
-  std::cout<<"Assigning Bounding Sphere Radii...\n";
+  //Assign Bounding Sphere Radii
   assignRadius();
 
-  std::cout<<"Assigning Delta Values...\n";
+  //Assign Delta Values;
   assignDelta(0,4,5,2);
   assignDelta(1,4,6,2);
   assignDelta(2,4,7,2);
   assignDelta(3,4,8,2);
 
-  std::cout<<"Assigning Augmented Delta Values...\n";
+  //Assign Augmented Delta Values;
   assignAugmentedDelta();
-
-  std::cout<<"Done \n";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,8 +68,8 @@ TerrainData::Vertex::Vertex(int _x, int _y, float _z, int _dimension, float _sca
   originalY = _y;
   originalZ = _z;
   //for scene coordinates, centre the grid at (0,0) then scale
-  sceneX = (float(_x-_dimension*0.5f))*_scale;
-  sceneY = (float(_y-_dimension*0.5f))*_scale;
+  sceneX = (float(_x-_dimension/2))*_scale;
+  sceneY = (float(_y-_dimension/2))*_scale;
   sceneZ = _z*_scale;
 }
 float TerrainData::Vertex::distanceTo(Vertex v) const
@@ -106,7 +103,7 @@ void TerrainData::meshRefine(ngl::Vec3 _cameraPos, float _tolerance, float _lamb
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///PRIVATE MEMBER FUNCTIONS: BASIC
+///PUBLIC MEMBER FUNCTIONS: BASIC
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -132,7 +129,7 @@ TerrainData::Vertex TerrainData::getVertex(const size_t _index) const
 
 
 //----------------------------------------------------------------------------------------------------------------------
-///PRIVATE MEMBER FUNCTIONS: CREATING VERTICES
+///PUBLIC MEMBER FUNCTIONS: CREATING VERTICES
 //----------------------------------------------------------------------------------------------------------------------
 
 void TerrainData::createVerticesWQT(size_t _QTParentHeightMapIndex, size_t _QTParentVerticesIndex,
@@ -223,7 +220,7 @@ void TerrainData::createVerticesBQT(size_t _QTParentHeightMapIndex, size_t _QTPa
 
 
 //----------------------------------------------------------------------------------------------------------------------
-///PRIVATE MEMBER FUNCTIONS: ASSIGNING CHILDREN
+///PUBLIC MEMBER FUNCTIONS: ASSIGNING CHILDREN
 //----------------------------------------------------------------------------------------------------------------------
 
 size_t TerrainData::getChild1(size_t _QTParent, size_t _DAGParent) const
@@ -255,7 +252,7 @@ void TerrainData::assignChildren(size_t _DAGParent, size_t _currentVertex, int _
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///PRIVATE METHODS: ASSIGN OTHER VERTEX MEMBER VARIABLES
+///PUBLIC METHODS: ASSIGN OTHER VERTEX MEMBER VARIABLES
 //----------------------------------------------------------------------------------------------------------------------
 
 void TerrainData::assignRadius()
@@ -310,7 +307,7 @@ void TerrainData::assignAugmentedDelta()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///PRIVATE METHODS CALLED BY MESH REFINE
+///PUBLIC METHODS CALLED BY MESH REFINE
 //----------------------------------------------------------------------------------------------------------------------
 ///@ref based on pseudocode from Lindstrom and Pascucci, 2001
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "terrainData.h"
+#include "TerrainData.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
 #include <cmath>
@@ -10,18 +10,18 @@ using namespace testing;
 //--------------------------------------------------------------------------------------------------------------------
 ///VERTEX STRUCT TESTS
 //--------------------------------------------------------------------------------------------------------------------
-TEST(terrainData::Vertex, userCtor)
+TEST(Vertex, userCtor)
 {
   TerrainData::Vertex vertex(2,3,1.5,5,0.5);
   EXPECT_EQ(vertex.originalX,2);
   EXPECT_EQ(vertex.originalY,3);
   EXPECT_EQ(vertex.originalZ,1.5);
-  EXPECT_EQ(vertex.screenX,0);
-  EXPECT_EQ(vertex.screenY,0.5);
-  EXPECT_EQ(vertex.screenZ,2.5);
+  EXPECT_EQ(vertex.sceneX,0);
+  EXPECT_EQ(vertex.sceneY,0.5);
+  EXPECT_EQ(vertex.sceneZ,2.5);
 }
 
-TEST(terrainData::Vertex, distanceTo)
+TEST(Vertex, distanceTo)
 {
   TerrainData::Vertex vertex1(2,3,1.5,5,0.5);
   TerrainData::Vertex vertex2(1,1,1,5,1);
@@ -32,17 +32,17 @@ TEST(terrainData::Vertex, distanceTo)
 //--------------------------------------------------------------------------------------------------------------------
 ///GENERIC PRIVATE MEMBER FUNCTION TESTS
 //--------------------------------------------------------------------------------------------------------------------
-
-TEST(terrainData, getX)
+/*
+TEST(TerrainData, getX)
 {
-  size_t dimension = 3;
+  int dimension = 3;
   std::vector<float> heightMap = {0,0,0,1,1,1,2,2,2};
   TerrainData terrain(dimension, heightMap);
   EXPECT_EQ(terrain.getX(2),0);
   EXPECT_EQ(terrain.getX(3),1);
 }
 
-TEST(terrainData, getY)
+TEST(TerrainData, getY)
 {
   size_t dimension = 3;
   std::vector<float> heightMap = {0,0,0,1,1,1,2,2,2};
@@ -51,7 +51,7 @@ TEST(terrainData, getY)
   EXPECT_EQ(terrain.getY(3),0);
 }
 
-TEST(terrainData, getHeightMapIndex)
+TEST(TerrainData, getHeightMapIndex)
 {
   size_t dimension = 3;
   std::vector<float> heightMap = {0,0,0,1,1,1,2,2,2};
@@ -60,7 +60,7 @@ TEST(terrainData, getHeightMapIndex)
   EXPECT_EQ(terrain.getHeightMapIndex(2,1),7);
 }
 
-TEST(terrainData, getVertex)
+TEST(TerrainData, getVertex)
 {
   size_t dimension = 3;
   std::vector<float> heightMap = {0,1,2,1,1,1,2,3,4};
@@ -70,7 +70,7 @@ TEST(terrainData, getVertex)
   EXPECT_EQ(terrain.getVertex(7).originalZ,2);
   EXPECT_EQ(terrain.getVertex(4).sceneX,(50.0/3.0)*);
 }
-
+*/
 
 /*TEST(terrainData,getChildren)
 {

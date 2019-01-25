@@ -3,8 +3,8 @@
 /// @brief MainWindow class, implementing NGL Scene and UI
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOW_H_
+#define MAINWINDOW_H_
 
 #include <QMainWindow>
 #include "NGLScene.h"
