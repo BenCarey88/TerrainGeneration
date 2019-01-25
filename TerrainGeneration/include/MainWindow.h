@@ -11,6 +11,11 @@
 #include "TerrainData.h"
 #include "TerrainGenerator.h"
 
+//----------------------------------------------------------------------------------------------------------------------
+/// @class MainWindow
+/// @brief this class creates our QT GUI and includes our NGLScene
+//----------------------------------------------------------------------------------------------------------------------
+
 namespace Ui {
   class MainWindow;
 }

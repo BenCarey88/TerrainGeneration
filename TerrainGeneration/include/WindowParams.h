@@ -4,12 +4,18 @@
 /// @version 2.0
 /// @date 23/01/19
 /// Revision History :
-/// 10.9/13: This is an initial version used for the new NGL6 / Qt 5 demos
+/// 10/9/13: This is an initial version used for the new NGL6 / Qt 5 demos
 /// 14/12/18: updated by Ben Carey for use in terrainGeneration project
 //----------------------------------------------------------------------------------------------------------------------
 
 #ifndef WINDOWPARAMS_H_
 #define WINDOWPARAMS_H_
+
+//----------------------------------------------------------------------------------------------------------------------
+/// @struct WinParams
+/// @brief this struct stores attributes for the QTWidget window used for things like mouse events
+//----------------------------------------------------------------------------------------------------------------------
+
 
 struct WinParams
 {
