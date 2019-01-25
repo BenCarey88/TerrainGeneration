@@ -10,7 +10,6 @@ out vec3 vertColour;
 
 void main()
 {
-  // calculate the vertex position
   gl_Position = MVP*vec4(inVert,1.0);
   vertColour = inColour;
 }

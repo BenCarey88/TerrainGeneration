@@ -1,6 +1,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 /// @file MainWindow.h
-/// @brief MainWindow class, implementing NGL Scene and UI
+/// @author QT
+/// @version 2.0
+/// @date 23/01/19
+/// Revision History :
+/// 23/01/19: updated by Ben Carey for use in terrainGeneration project
 //----------------------------------------------------------------------------------------------------------------------
 
 #ifndef MAINWINDOW_H_

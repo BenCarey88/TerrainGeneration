@@ -119,32 +119,37 @@ void NGLScene::buildVAO()
 
     //set colour
     ngl::Vec3 col;
-    float height = vertex.sceneZ/m_terrain.m_scale;
-    if (height > 8.5f)
+    float height = vertex.sceneZ/(m_terrain.m_scale*m_terrainValues.m_amplitude);
+    if (height > 0.8f)
     {
-      col = ngl::Vec3(1,1,1);
-      col*=std::abs(height)/10;
+      col  = ngl::Vec3(1,1,1);
+      col *= std::abs(height);
     }
-    else if (height > 3)
+    else if (height > 0.4f)
     {
-      col = ngl::Vec3(0.5,0.5,0.5);
-      col*=std::abs(height)/10;
+      col  = ngl::Vec3(0.5,0.5,0.5);
+      col *= std::abs(height);
     }
-    else if (height > 0)
+    else if (height > -0.4f)
     {
-      col = ngl::Vec3(0,1,0);
-      col*=std::abs(height)/10;
+      col  = ngl::Vec3(0.4f,0.8f,0);
+      col *= std::abs(height+0.4f)*0.5f;
+    }
+    else if (height > -0.8f)
+    {
+      col  = ngl::Vec3(0.25f,0.2f,0);
+      col *= (1-std::abs(height));
     }
     else
     {
-      col = ngl::Vec3(0,0.5,0);
-      col*=(std::abs(height)/10);
+      col  = ngl::Vec3(0.2f,0.2f,0);
+      col *= (1-std::abs(height));
     }
     vertAndColour.push_back(pos);
     vertAndColour.push_back(col);
   }
 
-  //create list of indices
+  // create list of indices
   std::vector<GLshort> indices;
   for(size_t i = 0; i< m_terrain.m_indices.size(); ++i)
   {
@@ -187,21 +192,10 @@ void NGLScene::paintGL()
   {
       glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   }
-  // Rotation based on the mouse position for our global
-  // transform
-  //ngl::Mat4 rotX;
-  //ngl::Mat4 rotY;
-  // create the rotation matrices
-  /*m_terrain.m_rotX.identity();
-  m_terrain.m_rotY.identity();
-  m_terrain.m_rotX.rotateX(m_win.spinXFace);
-  m_terrain.m_rotY.rotateY(m_win.spinYFace);*/
 
   m_view = ngl::lookAt(m_camera.m_from, m_camera.m_to, m_camera.m_up);
 
   buildVAO();
-    // multiply the rotations
-  //m_mouseGlobalTX=m_terrain.m_rotX*m_terrain.m_rotY; // rotY*rotX;
 
   ngl::Mat4 translate1;
   ngl::Mat4 translate2;
@@ -216,29 +210,9 @@ void NGLScene::paintGL()
   m_camera.m_up = m_camera.m_trueUp;
   m_camera.m_from -= m_camera.m_to;
   m_camera.m_from = rotX*rotY*m_camera.m_from;
-  m_camera.m_trueUp = rotX*rotY*m_camera.m_up;
+  m_camera.m_up = rotX*rotY*m_camera.m_up;
   m_camera.m_from += m_camera.m_to;
   m_camera.update();
-  m_camera.m_up = m_camera.m_trueUp;
-  /*std::cout<<"FROM: ("<<m_camera.m_from.m_x<<", "<<m_camera.m_from.m_y<<", "<<m_camera.m_from.m_z<<")\n"
-           <<"TO: ("<<m_camera.m_to.m_x<<", "<<m_camera.m_to.m_y<<", "<<m_camera.m_to.m_z<<")\n"
-           <<"UP: ("<<m_camera.m_up.m_x<<", "<<m_camera.m_up.m_y<<", "<<m_camera.m_up.m_z<<")\n"
-           <<"TRUE UP: ("<<m_camera.m_trueUp.m_x<<", "<<m_camera.m_trueUp.m_y<<", "<<m_camera.m_trueUp.m_z<<")\n"
-           <<"RIGHT: ("<<m_camera.m_right.m_x<<", "<<m_camera.m_right.m_y<<", "<<m_camera.m_right.m_z<<")\n"
-           <<"M_WIN_SPINX: "<<m_win.spinXFace<<", M_WIN_SPINY: "<<m_win.spinYFace<<"\n\n";*/
-
-  /*translate1.m_m[3][0]=-m_camera.m_to.m_x;
-  translate1.m_m[3][1]=-m_camera.m_to.m_y;
-  translate1.m_m[3][2]=-m_camera.m_to.m_z;
-
-  translate2.m_m[3][0]=m_camera.m_to.m_x;
-  translate2.m_m[3][1]=m_camera.m_to.m_y;
-  translate2.m_m[3][2]=m_camera.m_to.m_z;*/
-
-  // add the translations
-  //m_mouseGlobalTX.m_m[3][0] = m_modelPos.m_x;
-  //m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
-  //m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
 
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   (*shader)["ColourShader"]->use();
@@ -271,19 +245,6 @@ void NGLScene::mouseMoveEvent( QMouseEvent* _event )
     m_win.origX = _event->x();
     m_win.origY = _event->y();
 
-    /*ngl::Mat4 rotX;
-    ngl::Mat4 rotY;
-
-    rotX.rotateX(m_win.spinXFace);
-    rotY.rotateY(m_win.spinYFace);
-
-    //rotX.euler(m_win.spinXFace, m_camera.m_right.m_x, m_camera.m_right.m_y, m_camera.m_right.m_z);
-    //rotY.euler(m_win.spinXFace, m_camera.m_trueUp.m_x, m_camera.m_trueUp.m_y, m_camera.m_trueUp.m_z);
-    m_camera.m_from -= m_camera.m_to;
-    m_camera.m_from = rotX*rotY*m_camera.m_from;
-    m_camera.m_from += m_camera.m_to;
-    m_camera.update();*/
-
     update();
 
   }
@@ -294,13 +255,6 @@ void NGLScene::mouseMoveEvent( QMouseEvent* _event )
     int diffY      = static_cast<int>( _event->y() - m_win.origYPos );
     m_win.origXPos = _event->x();
     m_win.origYPos = _event->y();
-
-    //m_modelPos.m_x += INCREMENT * diffX;
-    //m_modelPos.m_y -= INCREMENT * diffY;
-
-    /*m_camera.m_from.m_x += INCREMENT * diffX;
-    m_camera.m_from.m_y += INCREMENT * diffY;
-    m_camera.m_from.m_z += 0;*/
 
     m_camera.update();
 
@@ -337,7 +291,7 @@ void NGLScene::mousePressEvent( QMouseEvent* _event )
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mouseReleaseEvent( QMouseEvent* _event )
 {
-  // that event is called when the mouse button is released
+  // this event is called when the mouse button is released
   // we then set Rotate to false
   if ( _event->button() == Qt::LeftButton )
   {
@@ -345,7 +299,7 @@ void NGLScene::mouseReleaseEvent( QMouseEvent* _event )
     m_win.spinXFace = 0;
     m_win.spinYFace = 0;
   }
-  // right mouse translate mode
+  // middle mouse translate mode
   if ( _event->button() == Qt::MidButton )
   {
     m_win.translate = false;
@@ -360,40 +314,12 @@ void NGLScene::wheelEvent( QWheelEvent* _event )
   if ( _event->delta() > 0 )
   {
     m_camera.m_from += ZOOM*(m_camera.m_to-m_camera.m_from);
-    //m_modelPos.m_z += ZOOM;
   }
   else if ( _event->delta() < 0 )
   {
     m_camera.m_from -= ZOOM*(m_camera.m_to-m_camera.m_from);
-    //m_modelPos.m_z -= ZOOM;
   }
   update();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-//NONE OF THIS WORKS - PROBABLY JUST DELETE
-void NGLScene::keyPressEvent(QKeyEvent* _event)
-{
-  // this method is called every time the main window recives a key event.
-  // we then switch on the key value and set the camera in the GLWindow
-    std::cout<<"KEYEVENT\n";
-  switch (_event->key())
-  {
-  // escape key to quit
-  case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
-  // turn on wirframe rendering
-  case Qt::Key_W : m_wireframe = true; std::cout<<"TEST \n";  break;
-  // turn off wire frame
-  case Qt::Key_S : m_wireframe = false; break;
-  // show full screen
-  case Qt::Key_F : showFullScreen(); break;
-  // show windowed
-  case Qt::Key_N : showNormal(); break;
-  default : break;
-  }
-  // finally update the GLWindow and re-draw
-  //if (isExposed())
-    update();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -418,6 +344,16 @@ void NGLScene::setLacunarity(double _lacunarity)
 void NGLScene::setPersistence(double _persistence)
 {
     m_terrainValues.m_persistence = _persistence;
+}
+
+void NGLScene::setAmplitude(double _amplitude)
+{
+    m_terrainValues.m_amplitude = float(_amplitude);
+}
+
+void NGLScene::setSeed(double _seed)
+{
+    m_terrainValues.m_seed = _seed;
 }
 
 void NGLScene::generate()

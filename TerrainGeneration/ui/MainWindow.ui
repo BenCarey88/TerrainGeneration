@@ -21,7 +21,7 @@
        <string>Generate</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="5" column="0">
+       <item row="5" column="0" colspan="2">
         <widget class="QDoubleSpinBox" name="m_persistence">
          <property name="minimum">
           <double>0.000000000000000</double>
@@ -34,6 +34,42 @@
          </property>
          <property name="value">
           <double>0.800000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="QDoubleSpinBox" name="m_amplitude">
+         <property name="value">
+          <double>10.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QDoubleSpinBox" name="m_frequency">
+         <property name="minimum">
+          <double>-4.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>4.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QDoubleSpinBox" name="m_lacunarity">
+         <property name="maximum">
+          <double>1000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.500000000000000</double>
          </property>
         </widget>
        </item>
@@ -51,43 +87,10 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QPushButton" name="m_generate">
-         <property name="text">
-          <string>GENERATE</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Octave Count</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QDoubleSpinBox" name="m_frequency">
-         <property name="minimum">
-          <double>-4.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>4.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.100000000000000</double>
-         </property>
-         <property name="value">
-          <double>1.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QSpinBox" name="m_octaves">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="value">
-          <number>3</number>
          </property>
         </widget>
        </item>
@@ -98,16 +101,44 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="QDoubleSpinBox" name="m_lacunarity">
+       <item row="12" column="0" colspan="2">
+        <widget class="QPushButton" name="m_generate">
+         <property name="text">
+          <string>GENERATE</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Amplitude</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2">
+        <widget class="QDoubleSpinBox" name="m_seed">
+         <property name="minimum">
+          <double>-1000.000000000000000</double>
+         </property>
          <property name="maximum">
           <double>1000.000000000000000</double>
          </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QSpinBox" name="m_octaves">
+         <property name="minimum">
+          <number>1</number>
          </property>
          <property name="value">
-          <double>0.500000000000000</double>
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Seed</string>
          </property>
         </widget>
        </item>
