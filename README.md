@@ -1,4 +1,4 @@
-#Terrain Generation using LOD reduction algorithm
+# Terrain Generation using LOD reduction algorithm
 
 This programme allows the user to quickly generate a variety of simple terrains using Perlin noise by changing number of octaves, frequency, persistence and lacunarity of the noise. It then runs a reduction algorithm on them to speed up rendering time. The user can also change the tolerance of the LOD algorithm and view the algorithm in action by setting the draw mode to wireframe and moving the camera.
 
